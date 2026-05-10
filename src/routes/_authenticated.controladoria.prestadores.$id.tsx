@@ -9,7 +9,7 @@ import { StatusBadge } from "@/components/serget/StatusBadge";
 import { STATUS_PRESTADOR, STATUS_CONTRATO, TIPO_DOCUMENTO_LABEL } from "@/lib/controladoria/constants";
 import { formatCnpjCpf, formatDateBR } from "@/lib/controladoria/format";
 
-export const Route = createFileRoute("/_authenticated/controladoria/prestadores/")({
+export const Route = createFileRoute("/_authenticated/controladoria/prestadores/$id")({
   component: PrestadorDetalhe,
 });
 
