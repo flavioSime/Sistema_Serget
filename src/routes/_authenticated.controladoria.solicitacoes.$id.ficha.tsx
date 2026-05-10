@@ -11,7 +11,7 @@ import { PageHeader } from "@/components/serget/PageHeader";
 import { logHistorico } from "@/lib/controladoria/historico";
 
 export const Route = createFileRoute(
-  "/_authenticated/controladoria/solicitacoes/ficha",
+  "/_authenticated/controladoria/solicitacoes/$id/ficha",
 )({
   component: FichaCadastralPage,
 });

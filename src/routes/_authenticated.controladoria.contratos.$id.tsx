@@ -15,7 +15,7 @@ import { formatDateBR } from "@/lib/controladoria/format";
 import { logHistorico } from "@/lib/controladoria/historico";
 import { gerarContratoIA } from "@/lib/controladoria/ai-contract.functions";
 
-export const Route = createFileRoute("/_authenticated/controladoria/contratos/")({
+export const Route = createFileRoute("/_authenticated/controladoria/contratos/$id")({
   component: ContratoPage,
 });
 
