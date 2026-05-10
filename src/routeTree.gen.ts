@@ -20,6 +20,7 @@ import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './rou
 import { Route as AuthenticatedControladoriaAprovacoesRouteImport } from './routes/_authenticated.controladoria.aprovacoes'
 import { Route as AuthenticatedControladoriaSolicitacoesFichaRouteImport } from './routes/_authenticated.controladoria.solicitacoes..ficha'
 import { Route as AuthenticatedControladoriaPrestadoresNovoRouteImport } from './routes/_authenticated.controladoria.prestadores.novo'
+import { Route as AuthenticatedControladoriaContratosRouteImport } from './routes/_authenticated.controladoria.contratos.'
 
 const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
   id: '/recuperar-senha',
@@ -80,6 +81,12 @@ const AuthenticatedControladoriaPrestadoresNovoRoute =
     path: '/novo',
     getParentRoute: () => AuthenticatedControladoriaPrestadoresRoute,
   } as any)
+const AuthenticatedControladoriaContratosRoute =
+  AuthenticatedControladoriaContratosRouteImport.update({
+    id: '/contratos/',
+    path: '/contratos/',
+    getParentRoute: () => AuthenticatedControladoriaRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/controladoria/contratos/': typeof AuthenticatedControladoriaContratosRoute
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
   '/controladoria/solicitacoes/ficha': typeof AuthenticatedControladoriaSolicitacoesFichaRoute
 }
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/controladoria/contratos': typeof AuthenticatedControladoriaContratosRoute
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
   '/controladoria/solicitacoes/ficha': typeof AuthenticatedControladoriaSolicitacoesFichaRoute
 }
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/_authenticated/controladoria/contratos/': typeof AuthenticatedControladoriaContratosRoute
   '/_authenticated/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
   '/_authenticated/controladoria/solicitacoes/ficha': typeof AuthenticatedControladoriaSolicitacoesFichaRoute
 }
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
+    | '/controladoria/contratos/'
     | '/controladoria/prestadores/novo'
     | '/controladoria/solicitacoes/ficha'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
+    | '/controladoria/contratos'
     | '/controladoria/prestadores/novo'
     | '/controladoria/solicitacoes/ficha'
   id:
@@ -155,6 +167,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/controladoria/aprovacoes'
     | '/_authenticated/controladoria/prestadores'
+    | '/_authenticated/controladoria/contratos/'
     | '/_authenticated/controladoria/prestadores/novo'
     | '/_authenticated/controladoria/solicitacoes/ficha'
   fileRoutesById: FileRoutesById
@@ -246,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedControladoriaPrestadoresNovoRouteImport
       parentRoute: typeof AuthenticatedControladoriaPrestadoresRoute
     }
+    '/_authenticated/controladoria/contratos/': {
+      id: '/_authenticated/controladoria/contratos/'
+      path: '/contratos'
+      fullPath: '/controladoria/contratos/'
+      preLoaderRoute: typeof AuthenticatedControladoriaContratosRouteImport
+      parentRoute: typeof AuthenticatedControladoriaRoute
+    }
   }
 }
 
@@ -267,6 +287,7 @@ const AuthenticatedControladoriaPrestadoresRouteWithChildren =
 interface AuthenticatedControladoriaRouteChildren {
   AuthenticatedControladoriaAprovacoesRoute: typeof AuthenticatedControladoriaAprovacoesRoute
   AuthenticatedControladoriaPrestadoresRoute: typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  AuthenticatedControladoriaContratosRoute: typeof AuthenticatedControladoriaContratosRoute
   AuthenticatedControladoriaSolicitacoesFichaRoute: typeof AuthenticatedControladoriaSolicitacoesFichaRoute
 }
 
@@ -276,6 +297,8 @@ const AuthenticatedControladoriaRouteChildren: AuthenticatedControladoriaRouteCh
       AuthenticatedControladoriaAprovacoesRoute,
     AuthenticatedControladoriaPrestadoresRoute:
       AuthenticatedControladoriaPrestadoresRouteWithChildren,
+    AuthenticatedControladoriaContratosRoute:
+      AuthenticatedControladoriaContratosRoute,
     AuthenticatedControladoriaSolicitacoesFichaRoute:
       AuthenticatedControladoriaSolicitacoesFichaRoute,
   }
