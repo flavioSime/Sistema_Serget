@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 
 const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
   id: '/recuperar-senha',
@@ -45,12 +46,19 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedControladoriaRoute =
+  AuthenticatedControladoriaRouteImport.update({
+    id: '/controladoria',
+    path: '/controladoria',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/controladoria': typeof AuthenticatedControladoriaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/controladoria': typeof AuthenticatedControladoriaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesById {
@@ -67,13 +76,26 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
+  '/_authenticated/controladoria': typeof AuthenticatedControladoriaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/nova-senha' | '/recuperar-senha' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/nova-senha'
+    | '/recuperar-senha'
+    | '/controladoria'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/nova-senha' | '/recuperar-senha' | '/dashboard'
+  to:
+    | '/'
+    | '/login'
+    | '/nova-senha'
+    | '/recuperar-senha'
+    | '/controladoria'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -81,6 +103,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/nova-senha'
     | '/recuperar-senha'
+    | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
   fileRoutesById: FileRoutesById
 }
@@ -136,14 +159,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/controladoria': {
+      id: '/_authenticated/controladoria'
+      path: '/controladoria'
+      fullPath: '/controladoria'
+      preLoaderRoute: typeof AuthenticatedControladoriaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedControladoriaRoute: typeof AuthenticatedControladoriaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedControladoriaRoute: AuthenticatedControladoriaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
@@ -161,3 +193,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
