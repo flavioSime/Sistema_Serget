@@ -8,10 +8,15 @@ interface Profile {
   email: string;
 }
 
+export type AppRole = "admin" | "gestor" | "operador" | "controladoria" | "diretoria";
+
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
   profile: Profile | null;
+  roles: AppRole[];
+  hasRole: (role: AppRole | AppRole[]) => boolean;
+  isControladoria: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -21,35 +26,38 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const loadProfileAndRoles = (userId: string) => {
+    supabase
+      .from("profiles")
+      .select("id, nome, email")
+      .eq("id", userId)
+      .maybeSingle()
+      .then(({ data }) => setProfile(data ?? null));
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .then(({ data }) => setRoles((data ?? []).map((r) => r.role as AppRole)));
+  };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       if (newSession?.user) {
-        // defer profile fetch
-        setTimeout(() => {
-          supabase
-            .from("profiles")
-            .select("id, nome, email")
-            .eq("id", newSession.user.id)
-            .maybeSingle()
-            .then(({ data }) => setProfile(data ?? null));
-        }, 0);
+        setTimeout(() => loadProfileAndRoles(newSession.user.id), 0);
       } else {
         setProfile(null);
+        setRoles([]);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session: existing } }) => {
       setSession(existing);
       if (existing?.user) {
-        supabase
-          .from("profiles")
-          .select("id, nome, email")
-          .eq("id", existing.user.id)
-          .maybeSingle()
-          .then(({ data }) => setProfile(data ?? null));
+        loadProfileAndRoles(existing.user.id);
       }
       setLoading(false);
     });
@@ -61,10 +69,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setSession(null);
     setProfile(null);
+    setRoles([]);
   };
 
+  const hasRole = (role: AppRole | AppRole[]) => {
+    const list = Array.isArray(role) ? role : [role];
+    return list.some((r) => roles.includes(r));
+  };
+  const isControladoria = hasRole(["admin", "controladoria", "diretoria"]);
+
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, signOut }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user: session?.user ?? null,
+        profile,
+        roles,
+        hasRole,
+        isControladoria,
+        loading,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

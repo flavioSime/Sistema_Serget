@@ -14,6 +14,305 @@ export type Database = {
   }
   public: {
     Tables: {
+      contratos_pj: {
+        Row: {
+          assinado_dani_em: string | null
+          assinado_dani_por: string | null
+          assinado_tatiane_em: string | null
+          assinado_tatiane_por: string | null
+          assinado_testemunha1_em: string | null
+          assinado_testemunha1_por: string | null
+          assinado_testemunha2_em: string | null
+          assinado_testemunha2_por: string | null
+          atualizado_em: string
+          conteudo_contrato: string
+          criado_em: string
+          enviado_prestador_em: string | null
+          id: string
+          modelo_utilizado: string
+          prestador_id: string
+          solicitacao_id: string
+          status: string
+          tipo_contrato: string
+          versao: number
+        }
+        Insert: {
+          assinado_dani_em?: string | null
+          assinado_dani_por?: string | null
+          assinado_tatiane_em?: string | null
+          assinado_tatiane_por?: string | null
+          assinado_testemunha1_em?: string | null
+          assinado_testemunha1_por?: string | null
+          assinado_testemunha2_em?: string | null
+          assinado_testemunha2_por?: string | null
+          atualizado_em?: string
+          conteudo_contrato: string
+          criado_em?: string
+          enviado_prestador_em?: string | null
+          id?: string
+          modelo_utilizado: string
+          prestador_id: string
+          solicitacao_id: string
+          status?: string
+          tipo_contrato: string
+          versao?: number
+        }
+        Update: {
+          assinado_dani_em?: string | null
+          assinado_dani_por?: string | null
+          assinado_tatiane_em?: string | null
+          assinado_tatiane_por?: string | null
+          assinado_testemunha1_em?: string | null
+          assinado_testemunha1_por?: string | null
+          assinado_testemunha2_em?: string | null
+          assinado_testemunha2_por?: string | null
+          atualizado_em?: string
+          conteudo_contrato?: string
+          criado_em?: string
+          enviado_prestador_em?: string | null
+          id?: string
+          modelo_utilizado?: string
+          prestador_id?: string
+          solicitacao_id?: string
+          status?: string
+          tipo_contrato?: string
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_pj_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_pj_solicitacao_id_fkey"
+            columns: ["solicitacao_id"]
+            isOneToOne: false
+            referencedRelation: "solicitacoes_pj"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos_pj: {
+        Row: {
+          contrato_id: string | null
+          criado_em: string
+          criado_por: string | null
+          id: string
+          nome_arquivo: string
+          prestador_id: string
+          status: string
+          storage_path: string
+          tipo_documento: string
+          validade_em: string | null
+          versao: number
+        }
+        Insert: {
+          contrato_id?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          nome_arquivo: string
+          prestador_id: string
+          status?: string
+          storage_path: string
+          tipo_documento: string
+          validade_em?: string | null
+          versao?: number
+        }
+        Update: {
+          contrato_id?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          nome_arquivo?: string
+          prestador_id?: string
+          status?: string
+          storage_path?: string
+          tipo_documento?: string
+          validade_em?: string | null
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_pj_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_pj"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_pj_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico: {
+        Row: {
+          acao: string
+          criado_em: string
+          entidade: string
+          entidade_id: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          acao: string
+          criado_em?: string
+          entidade: string
+          entidade_id: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          acao?: string
+          criado_em?: string
+          entidade?: string
+          entidade_id?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      prestador_colaboradores: {
+        Row: {
+          cpf: string | null
+          criado_em: string
+          funcao: string | null
+          id: string
+          nome: string
+          prestador_id: string
+        }
+        Insert: {
+          cpf?: string | null
+          criado_em?: string
+          funcao?: string | null
+          id?: string
+          nome: string
+          prestador_id: string
+        }
+        Update: {
+          cpf?: string | null
+          criado_em?: string
+          funcao?: string | null
+          id?: string
+          nome?: string
+          prestador_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prestador_colaboradores_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prestadores: {
+        Row: {
+          atualizado_em: string
+          cnpj: string | null
+          cpf: string | null
+          criado_em: string
+          criado_por: string | null
+          dados_bancarios: Json | null
+          email_contato: string
+          endereco: Json | null
+          id: string
+          razao_social: string
+          responsavel_cpf: string | null
+          responsavel_nome: string | null
+          status: string
+          telefone: string | null
+          tipo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          cnpj?: string | null
+          cpf?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          dados_bancarios?: Json | null
+          email_contato: string
+          endereco?: Json | null
+          id?: string
+          razao_social: string
+          responsavel_cpf?: string | null
+          responsavel_nome?: string | null
+          status?: string
+          telefone?: string | null
+          tipo: string
+        }
+        Update: {
+          atualizado_em?: string
+          cnpj?: string | null
+          cpf?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          dados_bancarios?: Json | null
+          email_contato?: string
+          endereco?: Json | null
+          id?: string
+          razao_social?: string
+          responsavel_cpf?: string | null
+          responsavel_nome?: string | null
+          status?: string
+          telefone?: string | null
+          tipo?: string
+        }
+        Relationships: []
+      }
+      processos: {
+        Row: {
+          atualizado_em: string
+          conexoes: Json | null
+          criado_em: string
+          criado_por: string | null
+          descricao: string | null
+          id: string
+          modulo: string
+          nome: string
+          raci: Json | null
+          status: string
+          versao: number
+        }
+        Insert: {
+          atualizado_em?: string
+          conexoes?: Json | null
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string | null
+          id?: string
+          modulo: string
+          nome: string
+          raci?: Json | null
+          status?: string
+          versao?: number
+        }
+        Update: {
+          atualizado_em?: string
+          conexoes?: Json | null
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string | null
+          id?: string
+          modulo?: string
+          nome?: string
+          raci?: Json | null
+          status?: string
+          versao?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -37,6 +336,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      solicitacoes_pj: {
+        Row: {
+          area_solicitante: string
+          atualizado_em: string
+          centro_custo: string
+          comentario_devolucao: string | null
+          criado_em: string
+          id: string
+          observacoes: string | null
+          prestador_id: string | null
+          responsavel_contratacao_id: string
+          servico_descricao: string
+          solicitante_id: string
+          status: string
+          tipo_pj: string
+          valor_estimado: number
+        }
+        Insert: {
+          area_solicitante: string
+          atualizado_em?: string
+          centro_custo: string
+          comentario_devolucao?: string | null
+          criado_em?: string
+          id?: string
+          observacoes?: string | null
+          prestador_id?: string | null
+          responsavel_contratacao_id: string
+          servico_descricao: string
+          solicitante_id: string
+          status?: string
+          tipo_pj: string
+          valor_estimado: number
+        }
+        Update: {
+          area_solicitante?: string
+          atualizado_em?: string
+          centro_custo?: string
+          comentario_devolucao?: string | null
+          criado_em?: string
+          id?: string
+          observacoes?: string | null
+          prestador_id?: string | null
+          responsavel_contratacao_id?: string
+          servico_descricao?: string
+          solicitante_id?: string
+          status?: string
+          tipo_pj?: string
+          valor_estimado?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitacoes_pj_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -71,9 +429,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_controladoria: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "gestor" | "operador"
+      app_role: "admin" | "gestor" | "operador" | "controladoria" | "diretoria"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -201,7 +560,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "gestor", "operador"],
+      app_role: ["admin", "gestor", "operador", "controladoria", "diretoria"],
     },
   },
 } as const
