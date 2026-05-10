@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './routes/_authenticated.controladoria.prestadores'
+import { Route as AuthenticatedControladoriaAprovacoesRouteImport } from './routes/_authenticated.controladoria.aprovacoes'
 import { Route as AuthenticatedControladoriaPrestadoresNovoRouteImport } from './routes/_authenticated.controladoria.prestadores.novo'
 
 const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
@@ -60,6 +61,12 @@ const AuthenticatedControladoriaPrestadoresRoute =
     path: '/prestadores',
     getParentRoute: () => AuthenticatedControladoriaRoute,
   } as any)
+const AuthenticatedControladoriaAprovacoesRoute =
+  AuthenticatedControladoriaAprovacoesRouteImport.update({
+    id: '/aprovacoes',
+    path: '/aprovacoes',
+    getParentRoute: () => AuthenticatedControladoriaRoute,
+  } as any)
 const AuthenticatedControladoriaPrestadoresNovoRoute =
   AuthenticatedControladoriaPrestadoresNovoRouteImport.update({
     id: '/novo',
@@ -74,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesByTo {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
 }
@@ -96,6 +105,7 @@ export interface FileRoutesById {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
   '/_authenticated/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
 }
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
     | '/controladoria/prestadores/novo'
   fileRoutesByTo: FileRoutesByTo
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
     | '/controladoria/prestadores/novo'
   id:
@@ -129,6 +141,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
+    | '/_authenticated/controladoria/aprovacoes'
     | '/_authenticated/controladoria/prestadores'
     | '/_authenticated/controladoria/prestadores/novo'
   fileRoutesById: FileRoutesById
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedControladoriaPrestadoresRouteImport
       parentRoute: typeof AuthenticatedControladoriaRoute
     }
+    '/_authenticated/controladoria/aprovacoes': {
+      id: '/_authenticated/controladoria/aprovacoes'
+      path: '/aprovacoes'
+      fullPath: '/controladoria/aprovacoes'
+      preLoaderRoute: typeof AuthenticatedControladoriaAprovacoesRouteImport
+      parentRoute: typeof AuthenticatedControladoriaRoute
+    }
     '/_authenticated/controladoria/prestadores/novo': {
       id: '/_authenticated/controladoria/prestadores/novo'
       path: '/novo'
@@ -225,11 +245,14 @@ const AuthenticatedControladoriaPrestadoresRouteWithChildren =
   )
 
 interface AuthenticatedControladoriaRouteChildren {
+  AuthenticatedControladoriaAprovacoesRoute: typeof AuthenticatedControladoriaAprovacoesRoute
   AuthenticatedControladoriaPrestadoresRoute: typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
 }
 
 const AuthenticatedControladoriaRouteChildren: AuthenticatedControladoriaRouteChildren =
   {
+    AuthenticatedControladoriaAprovacoesRoute:
+      AuthenticatedControladoriaAprovacoesRoute,
     AuthenticatedControladoriaPrestadoresRoute:
       AuthenticatedControladoriaPrestadoresRouteWithChildren,
   }
