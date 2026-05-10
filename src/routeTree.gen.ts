@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './routes/_authenticated.controladoria.prestadores'
+import { Route as AuthenticatedControladoriaPrestadoresNovoRouteImport } from './routes/_authenticated.controladoria.prestadores.novo'
 
 const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
   id: '/recuperar-senha',
@@ -59,6 +60,12 @@ const AuthenticatedControladoriaPrestadoresRoute =
     path: '/prestadores',
     getParentRoute: () => AuthenticatedControladoriaRoute,
   } as any)
+const AuthenticatedControladoriaPrestadoresNovoRoute =
+  AuthenticatedControladoriaPrestadoresNovoRouteImport.update({
+    id: '/novo',
+    path: '/novo',
+    getParentRoute: () => AuthenticatedControladoriaPrestadoresRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,7 +74,8 @@ export interface FileRoutesByFullPath {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRoute
+  '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,7 +84,8 @@ export interface FileRoutesByTo {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRoute
+  '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,7 +96,8 @@ export interface FileRoutesById {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRoute
+  '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/_authenticated/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/controladoria'
     | '/dashboard'
     | '/controladoria/prestadores'
+    | '/controladoria/prestadores/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/controladoria'
     | '/dashboard'
     | '/controladoria/prestadores'
+    | '/controladoria/prestadores/novo'
   id:
     | '__root__'
     | '/'
@@ -118,6 +130,7 @@ export interface FileRouteTypes {
     | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
     | '/_authenticated/controladoria/prestadores'
+    | '/_authenticated/controladoria/prestadores/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,17 +199,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedControladoriaPrestadoresRouteImport
       parentRoute: typeof AuthenticatedControladoriaRoute
     }
+    '/_authenticated/controladoria/prestadores/novo': {
+      id: '/_authenticated/controladoria/prestadores/novo'
+      path: '/novo'
+      fullPath: '/controladoria/prestadores/novo'
+      preLoaderRoute: typeof AuthenticatedControladoriaPrestadoresNovoRouteImport
+      parentRoute: typeof AuthenticatedControladoriaPrestadoresRoute
+    }
   }
 }
 
+interface AuthenticatedControladoriaPrestadoresRouteChildren {
+  AuthenticatedControladoriaPrestadoresNovoRoute: typeof AuthenticatedControladoriaPrestadoresNovoRoute
+}
+
+const AuthenticatedControladoriaPrestadoresRouteChildren: AuthenticatedControladoriaPrestadoresRouteChildren =
+  {
+    AuthenticatedControladoriaPrestadoresNovoRoute:
+      AuthenticatedControladoriaPrestadoresNovoRoute,
+  }
+
+const AuthenticatedControladoriaPrestadoresRouteWithChildren =
+  AuthenticatedControladoriaPrestadoresRoute._addFileChildren(
+    AuthenticatedControladoriaPrestadoresRouteChildren,
+  )
+
 interface AuthenticatedControladoriaRouteChildren {
-  AuthenticatedControladoriaPrestadoresRoute: typeof AuthenticatedControladoriaPrestadoresRoute
+  AuthenticatedControladoriaPrestadoresRoute: typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
 }
 
 const AuthenticatedControladoriaRouteChildren: AuthenticatedControladoriaRouteChildren =
   {
     AuthenticatedControladoriaPrestadoresRoute:
-      AuthenticatedControladoriaPrestadoresRoute,
+      AuthenticatedControladoriaPrestadoresRouteWithChildren,
   }
 
 const AuthenticatedControladoriaRouteWithChildren =
