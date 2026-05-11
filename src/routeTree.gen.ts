@@ -20,6 +20,7 @@ import { Route as FornecedorFichaRouteImport } from './routes/fornecedor.ficha'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 import { Route as FornecedorConviteTokenRouteImport } from './routes/fornecedor.convite.$token'
+import { Route as FornecedorContratoIdRouteImport } from './routes/fornecedor.contrato.$id'
 import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './routes/_authenticated.controladoria.prestadores'
 import { Route as AuthenticatedControladoriaAprovacoesRouteImport } from './routes/_authenticated.controladoria.aprovacoes'
 import { Route as AuthenticatedControladoriaPrestadoresNovoRouteImport } from './routes/_authenticated.controladoria.prestadores.novo'
@@ -82,6 +83,11 @@ const FornecedorConviteTokenRoute = FornecedorConviteTokenRouteImport.update({
   path: '/convite/$token',
   getParentRoute: () => FornecedorRoute,
 } as any)
+const FornecedorContratoIdRoute = FornecedorContratoIdRouteImport.update({
+  id: '/contrato/$id',
+  path: '/contrato/$id',
+  getParentRoute: () => FornecedorRoute,
+} as any)
 const AuthenticatedControladoriaPrestadoresRoute =
   AuthenticatedControladoriaPrestadoresRouteImport.update({
     id: '/prestadores',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/fornecedor/': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/fornecedor/contrato/$id': typeof FornecedorContratoIdRoute
   '/fornecedor/convite/$token': typeof FornecedorConviteTokenRoute
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/fornecedor': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/fornecedor/contrato/$id': typeof FornecedorContratoIdRoute
   '/fornecedor/convite/$token': typeof FornecedorConviteTokenRoute
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/fornecedor/': typeof FornecedorIndexRoute
   '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/fornecedor/contrato/$id': typeof FornecedorContratoIdRoute
   '/fornecedor/convite/$token': typeof FornecedorConviteTokenRoute
   '/_authenticated/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/_authenticated/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/fornecedor/'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
+    | '/fornecedor/contrato/$id'
     | '/fornecedor/convite/$token'
     | '/controladoria/contratos/$id'
     | '/controladoria/prestadores/$id'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/fornecedor'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
+    | '/fornecedor/contrato/$id'
     | '/fornecedor/convite/$token'
     | '/controladoria/contratos/$id'
     | '/controladoria/prestadores/$id'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/fornecedor/'
     | '/_authenticated/controladoria/aprovacoes'
     | '/_authenticated/controladoria/prestadores'
+    | '/fornecedor/contrato/$id'
     | '/fornecedor/convite/$token'
     | '/_authenticated/controladoria/contratos/$id'
     | '/_authenticated/controladoria/prestadores/$id'
@@ -317,6 +329,13 @@ declare module '@tanstack/react-router' {
       path: '/convite/$token'
       fullPath: '/fornecedor/convite/$token'
       preLoaderRoute: typeof FornecedorConviteTokenRouteImport
+      parentRoute: typeof FornecedorRoute
+    }
+    '/fornecedor/contrato/$id': {
+      id: '/fornecedor/contrato/$id'
+      path: '/contrato/$id'
+      fullPath: '/fornecedor/contrato/$id'
+      preLoaderRoute: typeof FornecedorContratoIdRouteImport
       parentRoute: typeof FornecedorRoute
     }
     '/_authenticated/controladoria/prestadores': {
@@ -423,12 +442,14 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 interface FornecedorRouteChildren {
   FornecedorFichaRoute: typeof FornecedorFichaRoute
   FornecedorIndexRoute: typeof FornecedorIndexRoute
+  FornecedorContratoIdRoute: typeof FornecedorContratoIdRoute
   FornecedorConviteTokenRoute: typeof FornecedorConviteTokenRoute
 }
 
 const FornecedorRouteChildren: FornecedorRouteChildren = {
   FornecedorFichaRoute: FornecedorFichaRoute,
   FornecedorIndexRoute: FornecedorIndexRoute,
+  FornecedorContratoIdRoute: FornecedorContratoIdRoute,
   FornecedorConviteTokenRoute: FornecedorConviteTokenRoute,
 }
 
