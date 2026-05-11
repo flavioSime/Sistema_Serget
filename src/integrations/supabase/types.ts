@@ -95,6 +95,80 @@ export type Database = {
           },
         ]
       }
+      convites_fornecedor: {
+        Row: {
+          criado_em: string
+          criado_por: string | null
+          email: string
+          expira_em: string
+          id: string
+          prestador_id: string
+          token: string
+          usado_em: string | null
+          user_id: string | null
+        }
+        Insert: {
+          criado_em?: string
+          criado_por?: string | null
+          email: string
+          expira_em?: string
+          id?: string
+          prestador_id: string
+          token?: string
+          usado_em?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          criado_em?: string
+          criado_por?: string | null
+          email?: string
+          expira_em?: string
+          id?: string
+          prestador_id?: string
+          token?: string
+          usado_em?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convites_fornecedor_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "prestadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentacao_projeto: {
+        Row: {
+          atualizado_em: string
+          atualizado_por: string | null
+          conteudo: string
+          id: string
+          tipo: string
+          titulo: string
+          versao: number
+        }
+        Insert: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          conteudo?: string
+          id?: string
+          tipo: string
+          titulo: string
+          versao?: number
+        }
+        Update: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          conteudo?: string
+          id?: string
+          tipo?: string
+          titulo?: string
+          versao?: number
+        }
+        Relationships: []
+      }
       documentos_pj: {
         Row: {
           contrato_id: string | null
@@ -345,6 +419,7 @@ export type Database = {
           comentario_devolucao: string | null
           criado_em: string
           id: string
+          lider_user_id: string | null
           observacoes: string | null
           prestador_id: string | null
           responsavel_contratacao_id: string
@@ -361,6 +436,7 @@ export type Database = {
           comentario_devolucao?: string | null
           criado_em?: string
           id?: string
+          lider_user_id?: string | null
           observacoes?: string | null
           prestador_id?: string | null
           responsavel_contratacao_id: string
@@ -377,6 +453,7 @@ export type Database = {
           comentario_devolucao?: string | null
           criado_em?: string
           id?: string
+          lider_user_id?: string | null
           observacoes?: string | null
           prestador_id?: string | null
           responsavel_contratacao_id?: string
@@ -430,9 +507,26 @@ export type Database = {
         Returns: boolean
       }
       is_controladoria: { Args: { _user_id: string }; Returns: boolean }
+      validar_convite_token: {
+        Args: { _token: string }
+        Returns: {
+          email: string
+          expira_em: string
+          id: string
+          prestador_id: string
+          usado_em: string
+        }[]
+      }
     }
     Enums: {
-      app_role: "admin" | "gestor" | "operador" | "controladoria" | "diretoria"
+      app_role:
+        | "admin"
+        | "gestor"
+        | "operador"
+        | "controladoria"
+        | "diretoria"
+        | "fornecedor"
+        | "lider"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -560,7 +654,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "gestor", "operador", "controladoria", "diretoria"],
+      app_role: [
+        "admin",
+        "gestor",
+        "operador",
+        "controladoria",
+        "diretoria",
+        "fornecedor",
+        "lider",
+      ],
     },
   },
 } as const

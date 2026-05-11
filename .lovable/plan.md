@@ -1,40 +1,51 @@
-## Sprint 1 — Controladoria · Processo PJ
+# Sprint 1 Revisado — Portal Fornecedor + Documentação
 
-Vou entregar o fluxo completo de Prestadores PJ, da solicitação até o arquivamento no GED após a assinatura do CEO. Antes de partir para a implementação, preciso confirmar alguns pontos para não construir suposição errada.
+## Etapa 1 — Banco de dados (uma migration)
+- `ALTER TYPE app_role ADD VALUE 'fornecedor'` e `'lider'`
+- Tabela `convites_fornecedor` (token, expira em 7d, RLS para admin/controladoria + leitura pública por token via RPC `validar_convite`)
+- Tabela `documentacao_projeto` (tipo `sistema`/`gestao`, conteúdo markdown, versão) + seeds iniciais
+- `solicitacoes_pj.lider_user_id` + policy "líder vê suas solicitações"
+- Função `is_admin(uuid)` se ainda não existir, e RPC `validar_convite_token(text)` SECURITY DEFINER que retorna o convite válido (sem expor a tabela inteira)
 
-### O que entra neste sprint
+## Etapa 2 — Server functions
+- `src/lib/controladoria/convite-fornecedor.functions.ts` → `criarConviteFornecedor` (admin client para `auth.admin.inviteUserByEmail` + insert em `convites_fornecedor`)
+- `src/lib/fornecedor/aceitar-convite.functions.ts` → `aceitarConvite` (valida token via RPC, marca `usado_em`, vincula `user_id`)
+- `src/lib/fornecedor/ficha.functions.ts` → `salvarFichaFornecedor` (atualiza `prestadores` apenas se o convite do user vincula ao prestador)
+- `src/lib/fornecedor/assinar-contrato.functions.ts` → `assinarContratoFornecedor`
+- Helpers em `*.server.ts` para o admin client
 
-1. **Banco (migration única)** — tabelas `prestadores`, `prestador_colaboradores`, `solicitacoes_pj`, `contratos_pj`, `documentos_pj`, `processos`, `historico` (log), com RLS por papel (admin, controladoria, diretoria, operador).
-2. **Papéis** — adicionar `controladoria` e `diretoria` ao enum `app_role` (já existem `admin` e `operador`).
-3. **Storage** — bucket privado `documentos-pj` com policies por papel.
-4. **Layout** — sidebar navegável com grupo "Controladoria → Prestadores PJ" e "Aprovações", visível apenas para admin/controladoria/diretoria.
-5. **Telas**
-   - `/controladoria/prestadores` — lista com filtros, busca, badges de status.
-   - `/controladoria/prestadores/$id` — detalhe com abas (Cadastrais, Contratos, Documentos/GED, Colaboradores [B], Histórico) + alertas de CND e contrato vencendo.
-   - `/controladoria/prestadores/novo` — formulário de solicitação (etapa 1).
-   - `/controladoria/aprovacoes` — fila do Dani (aprovar/devolver com comentário obrigatório).
-   - `/controladoria/solicitacoes/$id/ficha` — ficha cadastral pós-aprovação (Tipo A / Tipo B com colaboradores) + uploads.
-   - `/controladoria/contratos/$id` — geração com IA, edição inline, fluxo de assinaturas sequencial com barra de progresso.
-6. **Geração do contrato com IA** — server function via Lovable AI Gateway (`google/gemini-2.5-pro`), modelo A vs B selecionado pelo tipo, pré-preenchido com dados da solicitação + ficha.
-7. **Arquivamento automático no GED** — após `assinado_dani`, registro em `documentos_pj` (tipo `contrato`, status `vigente`) + entrada em `historico` + mensagem na UI.
-8. **Validações de negócio**
-   - Comentário obrigatório ao devolver.
-   - Contrato só pode ser gerado com ficha completa.
-   - CND vencida bloqueia geração de contrato (mensagem explicativa).
-   - Assinaturas em ordem rígida (Tatiane gestora → testemunha+resp. contratação → Dani).
-9. **Tom** — todas as toasts/mensagens seguem o DNA SERGET (humano, direto).
+## Etapa 3 — Hook auth atualizado
+Adicionar `fornecedor` e `lider` ao tipo `AppRole` e helpers `isFornecedor`, `isLider`, `isAdmin`.
 
-### Detalhes técnicos (resumo)
+## Etapa 4 — Portal Fornecedor (rotas novas)
+- `src/routes/fornecedor.tsx` — layout simples com Logo + Outlet (gate: precisa estar logado E ter papel fornecedor; senão redirect)
+- `src/routes/fornecedor.convite.$token.tsx` — pública, valida token, formulário de senha
+- `src/routes/fornecedor.ficha.tsx` — formulário cadastro + upload documentos com checklist
+- `src/routes/fornecedor.contrato.$id.tsx` — leitura + botão "Li e aceito"
+- `src/routes/fornecedor.index.tsx` — dashboard mínimo (status do processo)
 
-- **RLS**: `has_role()` já existe; vou adicionar funções helper para "qualquer papel de controladoria" e usar em todas as policies. Solicitante sempre vê suas próprias solicitações.
-- **Assinaturas**: papel "Tatiane gestora" e "Tatiane testemunha" identificadas por papel + ação manual (não há perfil distinto entre os dois — controlado pelo status do contrato). A assinatura do Dani requer papel `diretoria`. Resp. contratação assina como testemunha 2 (definido na solicitação).
-- **Histórico**: tabela genérica `historico (entidade, entidade_id, acao, payload jsonb, user_id, criado_em)`.
-- **Storage path**: `documentos-pj/{prestador_id}/{contrato_id|_}/{uuid}-{nome}`.
+## Etapa 5 — Ajustes Controladoria
+- Em `_authenticated.controladoria.prestadores.$id.tsx`:
+  - Botão "Enviar convite de acesso" (aba Cadastrais)
+  - Badge de status do fornecedor (convite enviado / ficha em preenchimento / enviada / aprovada)
+  - Aprovar / Solicitar reenvio em cada documento (modal de observação)
 
-### Perguntas antes de implementar
+## Etapa 6 — Documentação
+- `src/routes/_authenticated.documentacao.tsx` — duas abas (Sistema / Gestão), markdown via `react-markdown` (instalar), edição inline somente para admin, salvar incrementa versão.
+- Adicionar item no menu lateral do `AppShell` visível para admin/diretoria.
 
-1. **Assinatura do contrato** — neste sprint é uma assinatura "interna do sistema" (clique em "Assinar" registra `user_id + timestamp`), sem certificado digital. Confirma? (a Sprint 1 diz isso; só quero garantir antes de codar.)
-2. **Modelos de contrato A e B** — você tem o texto-modelo dos contratos para eu gravar como template, ou a IA gera do zero a partir das instruções do tipo? Por ora vou criar dois templates curtos genéricos e pedir para você substituir depois — ok?
-3. **Tatiane / Dani** — devo identificá-los por **papel** (`gestor_controladoria`, `diretoria`) ou por **usuário específico** (e-mail fixo)? Sugiro papel — qualquer usuário com o papel pode assinar a etapa correspondente.
+## Etapa 7 — Emails (escopo reduzido neste sprint)
+Usar Supabase Auth `inviteUserByEmail` para o convite do fornecedor (já cobre o email principal). Os outros emails (ficha aprovada, doc inválido, contrato pronto) ficam como TODO marcado em código + nota ao usuário, para evitar inflar o sprint sem domínio configurado de email. Vou avisar o usuário e oferecer ativar Lovable Emails depois.
 
-Se concordar com essas três premissas, sigo direto para a migration e a implementação completa nesta mesma rodada após a aprovação.
+## Detalhes técnicos
+- `react-markdown` será instalado via `bun add`.
+- O admin client já existe em `src/integrations/supabase/client.server.ts`.
+- RLS do `convites_fornecedor`: leitura/escrita só admin/controladoria; validação por token vai por RPC SECURITY DEFINER para a página pública.
+- Storage: usar bucket `documentos-pj` existente, prefixo `prestador_id/`.
+
+## Fora deste sprint (avisado ao usuário)
+- Certificado digital na assinatura
+- Templates oficiais de contrato (continua geração IA)
+- Domínio de email customizado / templates dos demais emails
+
+Aviso: vou executar a migration primeiro (precisa aprovação) e depois implementar tudo numa sequência só.
