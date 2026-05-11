@@ -16,6 +16,7 @@ import { STATUS_PRESTADOR, STATUS_CONTRATO, TIPO_DOCUMENTO_LABEL } from "@/lib/c
 import { formatCnpjCpf, formatDateBR } from "@/lib/controladoria/format";
 import { criarConviteFornecedor } from "@/lib/controladoria/convite-fornecedor.functions";
 import { logHistorico } from "@/lib/controladoria/historico";
+import { notificarEmail } from "@/lib/email/notify.functions";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/controladoria/prestadores/$id")({
@@ -34,6 +35,7 @@ function PrestadorDetalhe() {
   const [convite, setConvite] = useState<any | null>(null);
   const [enviandoConvite, setEnviandoConvite] = useState(false);
   const enviarConvite = useServerFn(criarConviteFornecedor);
+  const notificarEmailFn = useServerFn(notificarEmail);
   const [reenvioOpen, setReenvioOpen] = useState<string | null>(null);
   const [reenvioObs, setReenvioObs] = useState("");
 
@@ -75,7 +77,40 @@ function PrestadorDetalhe() {
     }
     await logHistorico("documento_pj", doc.id, "aprovado");
     toast.success("Documento aprovado.");
-    recarregarDocs();
+    await recarregarDocs();
+
+    // Verifica se todos os obrigatórios foram aprovados → notifica fornecedor
+    const TIPOS_OBRIGATORIOS = [
+      "contrato_social", "comprovante_end", "cnd_federal",
+      "cnd_estadual", "certidao_fgts",
+    ];
+    const { data: docsAtuais } = await supabase
+      .from("documentos_pj")
+      .select("tipo_documento, validado_em")
+      .eq("prestador_id", id);
+    const todosAprovados = TIPOS_OBRIGATORIOS.every((tipo) =>
+      (docsAtuais ?? []).some((d) => d.tipo_documento === tipo && d.validado_em),
+    );
+    if (todosAprovados) {
+      const { data: prestDados } = await supabase
+        .from("prestadores")
+        .select("email_contato, razao_social")
+        .eq("id", id)
+        .maybeSingle();
+      try {
+        await notificarEmailFn({
+          data: {
+            tipo: "ficha_aprovada",
+            entidade_id: id,
+            payload: {
+              email_fornecedor: prestDados?.email_contato ?? "",
+              razao_social: prestDados?.razao_social ?? "",
+            },
+          },
+        });
+        toast.success("Ficha totalmente aprovada. Fornecedor notificado.");
+      } catch (_) { /* não bloqueia */ }
+    }
   };
 
   const confirmarReenvio = async () => {
@@ -93,7 +128,32 @@ function PrestadorDetalhe() {
       return;
     }
     await logHistorico("documento_pj", reenvioOpen, "reenvio_solicitado", { obs: reenvioObs.trim() });
-    toast.success("Reenvio solicitado. O fornecedor será notificado.");
+
+    // Envia email de reenvio ao fornecedor
+    const { data: prestDados } = await supabase
+      .from("prestadores")
+      .select("email_contato")
+      .eq("id", id)
+      .maybeSingle();
+    const { data: docDados } = await supabase
+      .from("documentos_pj")
+      .select("nome_arquivo")
+      .eq("id", reenvioOpen)
+      .maybeSingle();
+    try {
+      await notificarEmailFn({
+        data: {
+          tipo: "reenvio_documento",
+          entidade_id: reenvioOpen,
+          payload: {
+            email_fornecedor: prestDados?.email_contato ?? "",
+            nome_arquivo: docDados?.nome_arquivo ?? "",
+            obs: reenvioObs.trim(),
+          },
+        },
+      });
+    } catch (_) { /* não bloqueia */ }
+    toast.success("Reenvio solicitado. O fornecedor foi notificado.");
     setReenvioOpen(null);
     setReenvioObs("");
     recarregarDocs();
