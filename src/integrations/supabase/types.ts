@@ -176,11 +176,14 @@ export type Database = {
           criado_por: string | null
           id: string
           nome_arquivo: string
+          obs_reenvio: string | null
           prestador_id: string
           status: string
           storage_path: string
           tipo_documento: string
           validade_em: string | null
+          validado_em: string | null
+          validado_por: string | null
           versao: number
         }
         Insert: {
@@ -189,11 +192,14 @@ export type Database = {
           criado_por?: string | null
           id?: string
           nome_arquivo: string
+          obs_reenvio?: string | null
           prestador_id: string
           status?: string
           storage_path: string
           tipo_documento: string
           validade_em?: string | null
+          validado_em?: string | null
+          validado_por?: string | null
           versao?: number
         }
         Update: {
@@ -202,11 +208,14 @@ export type Database = {
           criado_por?: string | null
           id?: string
           nome_arquivo?: string
+          obs_reenvio?: string | null
           prestador_id?: string
           status?: string
           storage_path?: string
           tipo_documento?: string
           validade_em?: string | null
+          validado_em?: string | null
+          validado_por?: string | null
           versao?: number
         }
         Relationships: [

@@ -1,13 +1,14 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogOut, LayoutDashboard, ChevronDown, Briefcase, Users, ClipboardList, BookOpen } from "lucide-react";
+import { LogOut, LayoutDashboard, ChevronDown, Briefcase, Users, ClipboardList, BookOpen, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { profile, user, signOut, isControladoria, isAdmin, hasRole } = useAuth();
+  const { profile, user, signOut, isControladoria, isAdmin, isLider, hasRole } = useAuth();
   const podeVerDocs = isAdmin || hasRole("diretoria");
+  const podeAbrirSolicitacao = isLider || isAdmin;
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openCtrl, setOpenCtrl] = useState(pathname.startsWith("/controladoria"));
@@ -40,6 +41,20 @@ export function AppShell({ children }: { children: ReactNode }) {
             <LayoutDashboard className="h-4 w-4" />
             Dashboard
           </Link>
+
+          {podeAbrirSolicitacao && (
+            <Link
+              to="/solicitacoes/novo"
+              search={{ sucesso: false }}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 hover:bg-sidebar-accent",
+                startsWith("/solicitacoes/novo") && "bg-sidebar-accent text-sidebar-accent-foreground",
+              )}
+            >
+              <Plus className="h-4 w-4" />
+              Nova solicitação
+            </Link>
+          )}
 
           {isControladoria && (
             <div>
