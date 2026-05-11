@@ -1,4 +1,9 @@
 export const STATUS_PRESTADOR = {
+  aguardando_aprovacao: { label: "Aguardando aprovação", className: "bg-amber-100 text-amber-800 border-amber-200" },
+  aprovado: { label: "Aprovado", className: "bg-blue-100 text-blue-800 border-blue-200" },
+  em_processo: { label: "Em processo", className: "bg-blue-100 text-blue-800 border-blue-200" },
+  aguardando_validacao: { label: "Aguardando validação", className: "bg-amber-100 text-amber-800 border-amber-200" },
+  aguardando_contrato: { label: "Aguardando contrato", className: "bg-amber-100 text-amber-800 border-amber-200" },
   ativo: { label: "Ativo", className: "bg-emerald-100 text-emerald-800 border-emerald-200" },
   inativo: { label: "Inativo", className: "bg-muted text-muted-foreground border-border" },
   suspenso: { label: "Suspenso", className: "bg-orange-100 text-orange-800 border-orange-200" },
