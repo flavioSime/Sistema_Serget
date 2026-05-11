@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FornecedorIndexRouteImport } from './routes/fornecedor.index'
 import { Route as FornecedorFichaRouteImport } from './routes/fornecedor.ficha'
+import { Route as AuthenticatedDocumentacaoRouteImport } from './routes/_authenticated.documentacao'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 import { Route as FornecedorConviteTokenRouteImport } from './routes/fornecedor.convite.$token'
@@ -67,6 +68,12 @@ const FornecedorFichaRoute = FornecedorFichaRouteImport.update({
   path: '/ficha',
   getParentRoute: () => FornecedorRoute,
 } as any)
+const AuthenticatedDocumentacaoRoute =
+  AuthenticatedDocumentacaoRouteImport.update({
+    id: '/documentacao',
+    path: '/documentacao',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -133,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/documentacao': typeof AuthenticatedDocumentacaoRoute
   '/fornecedor/ficha': typeof FornecedorFichaRoute
   '/fornecedor/': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
@@ -151,6 +159,7 @@ export interface FileRoutesByTo {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/documentacao': typeof AuthenticatedDocumentacaoRoute
   '/fornecedor/ficha': typeof FornecedorFichaRoute
   '/fornecedor': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
@@ -172,6 +181,7 @@ export interface FileRoutesById {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/documentacao': typeof AuthenticatedDocumentacaoRoute
   '/fornecedor/ficha': typeof FornecedorFichaRoute
   '/fornecedor/': typeof FornecedorIndexRoute
   '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/documentacao'
     | '/fornecedor/ficha'
     | '/fornecedor/'
     | '/controladoria/aprovacoes'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/documentacao'
     | '/fornecedor/ficha'
     | '/fornecedor'
     | '/controladoria/aprovacoes'
@@ -231,6 +243,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
+    | '/_authenticated/documentacao'
     | '/fornecedor/ficha'
     | '/fornecedor/'
     | '/_authenticated/controladoria/aprovacoes'
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/fornecedor/ficha'
       preLoaderRoute: typeof FornecedorFichaRouteImport
       parentRoute: typeof FornecedorRoute
+    }
+    '/_authenticated/documentacao': {
+      id: '/_authenticated/documentacao'
+      path: '/documentacao'
+      fullPath: '/documentacao'
+      preLoaderRoute: typeof AuthenticatedDocumentacaoRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -428,11 +448,13 @@ const AuthenticatedControladoriaRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedControladoriaRoute: typeof AuthenticatedControladoriaRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDocumentacaoRoute: typeof AuthenticatedDocumentacaoRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedControladoriaRoute: AuthenticatedControladoriaRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDocumentacaoRoute: AuthenticatedDocumentacaoRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
