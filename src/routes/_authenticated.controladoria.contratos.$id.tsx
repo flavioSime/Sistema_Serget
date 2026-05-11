@@ -174,7 +174,18 @@ function ContratoPage() {
       return;
     }
     const now = new Date().toISOString();
-    const update: Record<string, string> = {};
+    type ContratoUpdate = {
+      assinado_tatiane_em?: string;
+      assinado_tatiane_por?: string;
+      assinado_testemunha1_em?: string;
+      assinado_testemunha1_por?: string;
+      assinado_testemunha2_em?: string;
+      assinado_testemunha2_por?: string;
+      assinado_dani_em?: string;
+      assinado_dani_por?: string;
+      status?: string;
+    };
+    const update: ContratoUpdate = {};
     if (etapa.key === "tatiane") {
       update.assinado_tatiane_em = now;
       update.assinado_tatiane_por = user.id;
