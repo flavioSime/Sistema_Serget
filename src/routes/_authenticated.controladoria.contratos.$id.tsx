@@ -14,6 +14,7 @@ import { STATUS_CONTRATO } from "@/lib/controladoria/constants";
 import { formatDateBR } from "@/lib/controladoria/format";
 import { logHistorico } from "@/lib/controladoria/historico";
 import { gerarContratoIA } from "@/lib/controladoria/ai-contract.functions";
+import { notificarEmail } from "@/lib/email/notify.functions";
 
 export const Route = createFileRoute("/_authenticated/controladoria/contratos/$id")({
   component: ContratoPage,
@@ -46,6 +47,7 @@ function ContratoPage() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
   const gerar = useServerFn(gerarContratoIA);
+  const notificarEmailFn = useServerFn(notificarEmail);
 
   const [contrato, setContrato] = useState<Contrato | null>(null);
   const [conteudoEdit, setConteudoEdit] = useState("");
@@ -228,7 +230,27 @@ function ContratoPage() {
         status: "vigente",
       });
       await logHistorico("contrato_pj", contrato.id, "arquivado_ged");
-      toast.success("Contrato assinado por Dani e arquivado no GED. Pronto para envio ao prestador.");
+
+      // Notifica fornecedor que o contrato está pronto para assinar
+      const { data: prestDados } = await supabase
+        .from("prestadores")
+        .select("email_contato")
+        .eq("id", contrato.prestador_id)
+        .maybeSingle();
+      try {
+        await notificarEmailFn({
+          data: {
+            tipo: "contrato_pronto",
+            entidade_id: contrato.id,
+            payload: {
+              email_fornecedor: prestDados?.email_contato ?? "",
+              contrato_id: contrato.id,
+            },
+          },
+        });
+      } catch (_) { /* não bloqueia */ }
+
+      toast.success("Contrato assinado por Dani e arquivado no GED. Fornecedor notificado.");
     } else {
       toast.success(`Assinatura registrada. Próximo: ${ETAPAS[ETAPAS.findIndex((e) => e.key === etapa.key) + 1]?.label ?? "—"}.`);
     }

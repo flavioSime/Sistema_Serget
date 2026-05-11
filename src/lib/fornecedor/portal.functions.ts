@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { enviarNotificacao } from "@/lib/email/notify.server";
 
 /** Retorna o prestador vinculado ao fornecedor logado (via convite usado). */
 export const getMeuPrestador = createServerFn({ method: "GET" })
@@ -77,13 +78,25 @@ export const salvarFichaFornecedor = createServerFn({ method: "POST" })
       user_id: context.userId,
     });
 
-    // Notifica controladoria (stub — aguarda configuração de domínio)
-    await supabaseAdmin.from("historico").insert({
-      entidade: "email",
-      entidade_id: convite.prestador_id,
-      acao: "email_ficha_recebida",
-      user_id: context.userId,
-    });
+    // Notifica controladoria por email (não bloqueia em caso de falha)
+    const { data: prestDados } = await supabaseAdmin
+      .from("prestadores")
+      .select("razao_social")
+      .eq("id", convite.prestador_id)
+      .maybeSingle();
+    try {
+      await enviarNotificacao({
+        tipo: "ficha_recebida",
+        entidade_id: convite.prestador_id,
+        payload: {
+          razao_social: prestDados?.razao_social ?? "",
+          prestador_id: convite.prestador_id,
+        },
+        userId: context.userId,
+      });
+    } catch (_) {
+      /* não bloqueia */
+    }
 
     return { ok: true };
   });
