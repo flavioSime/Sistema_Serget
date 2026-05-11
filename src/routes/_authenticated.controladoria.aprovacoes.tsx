@@ -26,6 +26,7 @@ type Solicitacao = {
   solicitante_id: string;
   responsavel_contratacao_id: string;
   status: string;
+  prestador_id: string | null;
 };
 
 function AprovacoesPage() {
@@ -67,6 +68,12 @@ function AprovacoesPage() {
     if (error) {
       toast.error("Não foi possível aprovar. Tente novamente.");
       return;
+    }
+    if (s.prestador_id) {
+      await supabase
+        .from("prestadores")
+        .update({ status: "aprovado" })
+        .eq("id", s.prestador_id);
     }
     await logHistorico("solicitacao_pj", s.id, "aprovada");
     toast.success("Solicitação aprovada. Próximo passo: ficha cadastral.");
