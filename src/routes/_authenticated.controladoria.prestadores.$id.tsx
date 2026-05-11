@@ -1,16 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, AlertTriangle, FileText, Sparkles, Send } from "lucide-react";
+import { ArrowLeft, AlertTriangle, FileText, Sparkles, Send, CheckCircle2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 import { PageHeader } from "@/components/serget/PageHeader";
 import { StatusBadge } from "@/components/serget/StatusBadge";
 import { STATUS_PRESTADOR, STATUS_CONTRATO, TIPO_DOCUMENTO_LABEL } from "@/lib/controladoria/constants";
 import { formatCnpjCpf, formatDateBR } from "@/lib/controladoria/format";
 import { criarConviteFornecedor } from "@/lib/controladoria/convite-fornecedor.functions";
+import { logHistorico } from "@/lib/controladoria/historico";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/controladoria/prestadores/$id")({
   component: PrestadorDetalhe,
@@ -18,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/controladoria/prestadores/
 
 function PrestadorDetalhe() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const [prest, setPrest] = useState<any>(null);
   const [contratos, setContratos] = useState<any[]>([]);
   const [docs, setDocs] = useState<any[]>([]);
@@ -27,6 +34,8 @@ function PrestadorDetalhe() {
   const [convite, setConvite] = useState<any | null>(null);
   const [enviandoConvite, setEnviandoConvite] = useState(false);
   const enviarConvite = useServerFn(criarConviteFornecedor);
+  const [reenvioOpen, setReenvioOpen] = useState<string | null>(null);
+  const [reenvioObs, setReenvioObs] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -44,6 +53,51 @@ function PrestadorDetalhe() {
   }, [id]);
 
   if (!prest) return <p className="p-6 text-sm text-muted-foreground">Carregando…</p>;
+
+  const recarregarDocs = async () => {
+    const { data } = await supabase
+      .from("documentos_pj")
+      .select("*")
+      .eq("prestador_id", id)
+      .order("criado_em", { ascending: false });
+    setDocs(data ?? []);
+  };
+
+  const aprovarDoc = async (doc: any) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("documentos_pj")
+      .update({ validado_em: new Date().toISOString(), validado_por: user.id, status: "vigente" })
+      .eq("id", doc.id);
+    if (error) {
+      toast.error("Não foi possível aprovar.");
+      return;
+    }
+    await logHistorico("documento_pj", doc.id, "aprovado");
+    toast.success("Documento aprovado.");
+    recarregarDocs();
+  };
+
+  const confirmarReenvio = async () => {
+    if (!user || !reenvioOpen) return;
+    if (reenvioObs.trim().length < 10) {
+      toast.error("Descreva o motivo do reenvio (mínimo 10 caracteres).");
+      return;
+    }
+    const { error } = await supabase
+      .from("documentos_pj")
+      .update({ status: "substituido", obs_reenvio: reenvioObs.trim() })
+      .eq("id", reenvioOpen);
+    if (error) {
+      toast.error("Não foi possível solicitar reenvio.");
+      return;
+    }
+    await logHistorico("documento_pj", reenvioOpen, "reenvio_solicitado", { obs: reenvioObs.trim() });
+    toast.success("Reenvio solicitado. O fornecedor será notificado.");
+    setReenvioOpen(null);
+    setReenvioObs("");
+    recarregarDocs();
+  };
 
   const conviteAtivo = convite && !convite.usado_em && new Date(convite.expira_em) > new Date();
   const conviteUsado = convite && !!convite.usado_em;
@@ -181,7 +235,13 @@ function PrestadorDetalhe() {
             ) : (
               <table className="w-full text-sm">
                 <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase text-muted-foreground">
-                  <tr><th className="px-4 py-2">Tipo</th><th className="px-4 py-2">Arquivo</th><th className="px-4 py-2">Validade</th><th className="px-4 py-2">Status</th></tr>
+                  <tr>
+                    <th className="px-4 py-2">Tipo</th>
+                    <th className="px-4 py-2">Arquivo</th>
+                    <th className="px-4 py-2">Validade</th>
+                    <th className="px-4 py-2">Status</th>
+                    <th className="px-4 py-2 text-right">Ações</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {docs.map((d) => (
@@ -189,12 +249,63 @@ function PrestadorDetalhe() {
                       <td className="px-4 py-2">{TIPO_DOCUMENTO_LABEL[d.tipo_documento] ?? d.tipo_documento}</td>
                       <td className="px-4 py-2">{d.nome_arquivo}</td>
                       <td className="px-4 py-2">{formatDateBR(d.validade_em)}</td>
-                      <td className="px-4 py-2 capitalize">{d.status}</td>
+                      <td className="px-4 py-2">
+                        {d.validado_em ? (
+                          <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                            Aprovado
+                          </span>
+                        ) : d.status === "substituido" ? (
+                          <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-800">
+                            Reenvio solicitado
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
+                            Aguardando validação
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        <div className="flex justify-end gap-2">
+                          {!d.validado_em && (
+                            <>
+                              <Button size="sm" variant="outline" className="gap-1" onClick={() => aprovarDoc(d)}>
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                Aprovar
+                              </Button>
+                              <Button size="sm" variant="outline" className="gap-1" onClick={() => { setReenvioOpen(d.id); setReenvioObs(""); }}>
+                                <RotateCcw className="h-3.5 w-3.5" />
+                                Solicitar reenvio
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             )}
+
+            <Dialog open={!!reenvioOpen} onOpenChange={(o) => { if (!o) setReenvioOpen(null); }}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Solicitar reenvio</DialogTitle>
+                  <DialogDescription>
+                    Explique ao fornecedor o motivo. Essa observação é incluída no e-mail.
+                  </DialogDescription>
+                </DialogHeader>
+                <Textarea
+                  value={reenvioObs}
+                  onChange={(e) => setReenvioObs(e.target.value)}
+                  rows={4}
+                  placeholder="Ex.: Documento ilegível, validade vencida..."
+                />
+                <DialogFooter>
+                  <Button variant="ghost" onClick={() => setReenvioOpen(null)}>Cancelar</Button>
+                  <Button onClick={confirmarReenvio}>Confirmar</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           {prest.tipo === "B" && (
