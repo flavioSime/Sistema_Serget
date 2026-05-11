@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2 } from "lucide-react";
@@ -17,9 +17,6 @@ import { PageHeader } from "@/components/serget/PageHeader";
 import { criarSolicitacaoLider } from "@/lib/controladoria/solicitacao-lider.functions";
 
 export const Route = createFileRoute("/_authenticated/solicitacoes/novo")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    sucesso: s.sucesso === "1" || s.sucesso === 1 ? true : false,
-  }),
   component: NovaSolicitacaoLider,
 });
 
@@ -38,15 +35,15 @@ const schema = z.object({
 type Usuario = { id: string; nome: string; email: string };
 
 function NovaSolicitacaoLider() {
-  const { sucesso } = Route.useSearch();
-  const navigate = useNavigate();
   const enviar = useServerFn(criarSolicitacaoLider);
+  const [sucesso, setSucesso] = useState(false);
 
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [tipo, setTipo] = useState<"A" | "B">("A");
   const [responsavel, setResponsavel] = useState("");
   const [valor, setValor] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   useEffect(() => {
     supabase
@@ -78,7 +75,7 @@ function NovaSolicitacaoLider() {
     try {
       await enviar({ data: parsed.data });
       toast.success("Solicitação enviada. A diretoria será notificada para aprovação.");
-      navigate({ to: "/solicitacoes/novo", search: { sucesso: true } });
+      setSucesso(true);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Não foi possível enviar.");
     } finally {
@@ -95,17 +92,23 @@ function NovaSolicitacaoLider() {
         />
         <div className="px-6 py-10">
           <div className="mx-auto max-w-xl rounded-lg border border-border bg-card p-8 text-center">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
-            <h3 className="mt-3 text-base font-medium">Tudo certo!</h3>
+            <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-600" />
+            <h3 className="mt-3 text-lg font-semibold">Solicitação enviada com sucesso!</h3>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               A diretoria foi notificada e fará a análise. Você receberá retorno
               assim que houver decisão.
             </p>
             <Button
-              onClick={() => navigate({ to: "/solicitacoes/novo", search: { sucesso: false } })}
+              onClick={() => {
+                setSucesso(false);
+                setTipo("A");
+                setResponsavel("");
+                setValor("");
+                setFormKey((k) => k + 1);
+              }}
               className="mt-6"
             >
-              Nova solicitação
+              Fazer nova solicitação
             </Button>
           </div>
         </div>
@@ -120,7 +123,7 @@ function NovaSolicitacaoLider() {
         description="Preencha as informações para iniciar uma contratação. A controladoria valida e gera o contrato."
       />
 
-      <form onSubmit={onSubmit} className="px-6 py-6">
+      <form key={formKey} onSubmit={onSubmit} className="px-6 py-6">
         <div className="mx-auto max-w-2xl space-y-6 rounded-lg border border-border bg-card p-6">
           <div className="space-y-3">
             <Label>Tipo de PJ</Label>

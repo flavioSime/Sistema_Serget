@@ -92,6 +92,10 @@ function PrestadorDetalhe() {
       (docsAtuais ?? []).some((d) => d.tipo_documento === tipo && d.validado_em),
     );
     if (todosAprovados) {
+      await supabase
+        .from("prestadores")
+        .update({ status: "aguardando_contrato" })
+        .eq("id", id);
       const { data: prestDados } = await supabase
         .from("prestadores")
         .select("email_contato, razao_social")

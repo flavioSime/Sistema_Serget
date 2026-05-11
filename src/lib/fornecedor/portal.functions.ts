@@ -71,6 +71,11 @@ export const salvarFichaFornecedor = createServerFn({ method: "POST" })
       throw new Error("Não foi possível salvar a ficha.");
     }
 
+    await supabaseAdmin
+      .from("prestadores")
+      .update({ status: "aguardando_validacao" })
+      .eq("id", convite.prestador_id);
+
     await supabaseAdmin.from("historico").insert({
       entidade: "prestador",
       entidade_id: convite.prestador_id,
@@ -134,6 +139,11 @@ export const assinarContratoFornecedor = createServerFn({ method: "POST" })
       })
       .eq("id", data.contrato_id);
     if (error) throw new Error("Não foi possível registrar a assinatura.");
+
+    await supabaseAdmin
+      .from("prestadores")
+      .update({ status: "ativo" })
+      .eq("id", convite.prestador_id);
 
     await supabaseAdmin.from("historico").insert({
       entidade: "contrato_pj",

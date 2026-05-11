@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +30,7 @@ type Prestador = {
 };
 
 function PrestadoresList() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Prestador[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterTipo, setFilterTipo] = useState<string>("todos");
@@ -121,7 +122,11 @@ function PrestadoresList() {
               {items.map((p) => {
                 const st = STATUS_PRESTADOR[p.status];
                 return (
-                  <tr key={p.id} className="border-b border-border last:border-0 hover:bg-muted/30">
+                  <tr
+                    key={p.id}
+                    className="cursor-pointer border-b border-border last:border-0 hover:bg-muted/40 transition-colors"
+                    onClick={() => navigate({ to: "/controladoria/prestadores/$id", params: { id: p.id } })}
+                  >
                     <td className="px-4 py-3 font-medium text-card-foreground">{p.razao_social}</td>
                     <td className="px-4 py-3 text-muted-foreground">{formatCnpjCpf(p)}</td>
                     <td className="px-4 py-3">
@@ -130,7 +135,7 @@ function PrestadoresList() {
                       </span>
                     </td>
                     <td className="px-4 py-3"><StatusBadge label={st.label} className={st.className} /></td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <Button asChild variant="ghost" size="sm">
                         <Link to="/controladoria/prestadores/$id" params={{ id: p.id }}>Abrir</Link>
                       </Button>

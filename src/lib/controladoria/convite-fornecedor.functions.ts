@@ -37,6 +37,11 @@ export const criarConviteFornecedor = createServerFn({ method: "POST" })
       throw new Error("Não foi possível registrar o convite.");
     }
 
+    await supabaseAdmin
+      .from("prestadores")
+      .update({ status: "em_processo" })
+      .eq("id", data.prestador_id);
+
     const linkAcesso = `${origin}/fornecedor/convite/${convite.token}`;
 
     const { error: emailError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
