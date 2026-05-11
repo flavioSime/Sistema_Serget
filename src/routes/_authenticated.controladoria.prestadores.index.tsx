@@ -16,7 +16,7 @@ import { StatusBadge } from "@/components/serget/StatusBadge";
 import { STATUS_PRESTADOR } from "@/lib/controladoria/constants";
 import { formatCnpjCpf } from "@/lib/controladoria/format";
 
-export const Route = createFileRoute("/_authenticated/controladoria/prestadores")({
+export const Route = createFileRoute("/_authenticated/controladoria/prestadores/")({
   component: PrestadoresList,
 });
 
