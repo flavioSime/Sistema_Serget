@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, AlertTriangle, FileText, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, AlertTriangle, FileText, Sparkles, Send } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +10,7 @@ import { PageHeader } from "@/components/serget/PageHeader";
 import { StatusBadge } from "@/components/serget/StatusBadge";
 import { STATUS_PRESTADOR, STATUS_CONTRATO, TIPO_DOCUMENTO_LABEL } from "@/lib/controladoria/constants";
 import { formatCnpjCpf, formatDateBR } from "@/lib/controladoria/format";
+import { criarConviteFornecedor } from "@/lib/controladoria/convite-fornecedor.functions";
 
 export const Route = createFileRoute("/_authenticated/controladoria/prestadores/$id")({
   component: PrestadorDetalhe,
@@ -21,22 +24,59 @@ function PrestadorDetalhe() {
   const [colabs, setColabs] = useState<any[]>([]);
   const [hist, setHist] = useState<any[]>([]);
   const [solicitAprovada, setSolicitAprovada] = useState<any | null>(null);
+  const [convite, setConvite] = useState<any | null>(null);
+  const [enviandoConvite, setEnviandoConvite] = useState(false);
+  const enviarConvite = useServerFn(criarConviteFornecedor);
 
   useEffect(() => {
     (async () => {
-      const [{ data: p }, { data: c }, { data: d }, { data: cb }, { data: h }, { data: sa }] = await Promise.all([
+      const [{ data: p }, { data: c }, { data: d }, { data: cb }, { data: h }, { data: sa }, { data: cv }] = await Promise.all([
         supabase.from("prestadores").select("*").eq("id", id).maybeSingle(),
         supabase.from("contratos_pj").select("*").eq("prestador_id", id).order("criado_em", { ascending: false }),
         supabase.from("documentos_pj").select("*").eq("prestador_id", id).order("criado_em", { ascending: false }),
         supabase.from("prestador_colaboradores").select("*").eq("prestador_id", id),
         supabase.from("historico").select("*").eq("entidade_id", id).order("criado_em", { ascending: false }).limit(50),
         supabase.from("solicitacoes_pj").select("*").eq("prestador_id", id).eq("status", "aprovado").maybeSingle(),
+        supabase.from("convites_fornecedor").select("*").eq("prestador_id", id).order("criado_em", { ascending: false }).limit(1).maybeSingle(),
       ]);
-      setPrest(p); setContratos(c ?? []); setDocs(d ?? []); setColabs(cb ?? []); setHist(h ?? []); setSolicitAprovada(sa);
+      setPrest(p); setContratos(c ?? []); setDocs(d ?? []); setColabs(cb ?? []); setHist(h ?? []); setSolicitAprovada(sa); setConvite(cv ?? null);
     })();
   }, [id]);
 
   if (!prest) return <p className="p-6 text-sm text-muted-foreground">Carregando…</p>;
+
+  const conviteAtivo = convite && !convite.usado_em && new Date(convite.expira_em) > new Date();
+  const conviteUsado = convite && !!convite.usado_em;
+
+  const handleEnviarConvite = async () => {
+    setEnviandoConvite(true);
+    try {
+      const r: any = await enviarConvite({
+        data: {
+          prestador_id: prest.id,
+          email: prest.email_contato,
+          nome: prest.responsavel_nome ?? prest.razao_social,
+        },
+      });
+      if (r?.emailEnviado === false) {
+        toast.success(`Convite criado para ${r.email}. Encaminhe o link manualmente.`);
+      } else {
+        toast.success(`Convite enviado para ${r.email}.`);
+      }
+      const { data: cv } = await supabase
+        .from("convites_fornecedor")
+        .select("*")
+        .eq("prestador_id", prest.id)
+        .order("criado_em", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setConvite(cv ?? null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível enviar o convite.");
+    } finally {
+      setEnviandoConvite(false);
+    }
+  };
 
   const st = STATUS_PRESTADOR[prest.status as keyof typeof STATUS_PRESTADOR];
   const hoje = new Date();
@@ -89,6 +129,22 @@ function PrestadorDetalhe() {
           </TabsList>
 
           <TabsContent value="cadastrais" className="rounded-lg border border-border bg-card p-5 text-sm">
+            <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Acesso do fornecedor</div>
+                <div className="mt-1 text-sm">
+                  {conviteUsado
+                    ? "Acesso ativo — fornecedor pode preencher a ficha."
+                    : conviteAtivo
+                      ? `Convite enviado para ${convite.email} (aguardando aceite).`
+                      : "Nenhum convite ativo."}
+                </div>
+              </div>
+              <Button size="sm" variant="outline" onClick={handleEnviarConvite} disabled={enviandoConvite} className="gap-2">
+                <Send className="h-4 w-4" />
+                {enviandoConvite ? "Enviando…" : conviteAtivo || conviteUsado ? "Reenviar convite" : "Enviar convite de acesso"}
+              </Button>
+            </div>
             <dl className="grid gap-3 sm:grid-cols-2">
               <Info label="E-mail">{prest.email_contato}</Info>
               <Info label="Telefone">{prest.telefone ?? "—"}</Info>

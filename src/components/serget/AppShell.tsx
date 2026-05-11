@@ -1,12 +1,13 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogOut, LayoutDashboard, ChevronDown, Briefcase, Users, ClipboardList } from "lucide-react";
+import { LogOut, LayoutDashboard, ChevronDown, Briefcase, Users, ClipboardList, BookOpen } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { profile, user, signOut, isControladoria } = useAuth();
+  const { profile, user, signOut, isControladoria, isAdmin, hasRole } = useAuth();
+  const podeVerDocs = isAdmin || hasRole("diretoria");
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openCtrl, setOpenCtrl] = useState(pathname.startsWith("/controladoria"));
@@ -83,6 +84,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </div>
               )}
             </div>
+          )}
+
+          {podeVerDocs && (
+            <Link
+              to="/documentacao"
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 hover:bg-sidebar-accent",
+                startsWith("/documentacao") && "bg-sidebar-accent text-sidebar-accent-foreground",
+              )}
+            >
+              <BookOpen className="h-4 w-4" />
+              Documentação
+            </Link>
           )}
         </nav>
         <div className="border-t border-sidebar-border px-4 py-3 text-xs text-sidebar-foreground/70">

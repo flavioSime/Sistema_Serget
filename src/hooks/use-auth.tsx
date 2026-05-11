@@ -8,7 +8,7 @@ interface Profile {
   email: string;
 }
 
-export type AppRole = "admin" | "gestor" | "operador" | "controladoria" | "diretoria";
+export type AppRole = "admin" | "gestor" | "operador" | "controladoria" | "diretoria" | "fornecedor" | "lider";
 
 interface AuthContextValue {
   session: Session | null;
@@ -17,6 +17,9 @@ interface AuthContextValue {
   roles: AppRole[];
   hasRole: (role: AppRole | AppRole[]) => boolean;
   isControladoria: boolean;
+  isFornecedor: boolean;
+  isLider: boolean;
+  isAdmin: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -77,6 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return list.some((r) => roles.includes(r));
   };
   const isControladoria = hasRole(["admin", "controladoria", "diretoria"]);
+  const isFornecedor = hasRole("fornecedor");
+  const isLider = hasRole("lider");
+  const isAdmin = hasRole("admin");
 
   return (
     <AuthContext.Provider
@@ -87,6 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         roles,
         hasRole,
         isControladoria,
+        isFornecedor,
+        isLider,
+        isAdmin,
         loading,
         signOut,
       }}

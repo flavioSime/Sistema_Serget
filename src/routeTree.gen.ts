@@ -12,10 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as NovaSenhaRouteImport } from './routes/nova-senha'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FornecedorRouteImport } from './routes/fornecedor'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FornecedorIndexRouteImport } from './routes/fornecedor.index'
+import { Route as FornecedorFichaRouteImport } from './routes/fornecedor.ficha'
+import { Route as AuthenticatedDocumentacaoRouteImport } from './routes/_authenticated.documentacao'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
+import { Route as FornecedorConviteTokenRouteImport } from './routes/fornecedor.convite.$token'
+import { Route as FornecedorContratoIdRouteImport } from './routes/fornecedor.contrato.$id'
 import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './routes/_authenticated.controladoria.prestadores'
 import { Route as AuthenticatedControladoriaAprovacoesRouteImport } from './routes/_authenticated.controladoria.aprovacoes'
 import { Route as AuthenticatedControladoriaPrestadoresNovoRouteImport } from './routes/_authenticated.controladoria.prestadores.novo'
@@ -38,6 +44,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FornecedorRoute = FornecedorRouteImport.update({
+  id: '/fornecedor',
+  path: '/fornecedor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -47,6 +58,22 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FornecedorIndexRoute = FornecedorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FornecedorRoute,
+} as any)
+const FornecedorFichaRoute = FornecedorFichaRouteImport.update({
+  id: '/ficha',
+  path: '/ficha',
+  getParentRoute: () => FornecedorRoute,
+} as any)
+const AuthenticatedDocumentacaoRoute =
+  AuthenticatedDocumentacaoRouteImport.update({
+    id: '/documentacao',
+    path: '/documentacao',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -58,6 +85,16 @@ const AuthenticatedControladoriaRoute =
     path: '/controladoria',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const FornecedorConviteTokenRoute = FornecedorConviteTokenRouteImport.update({
+  id: '/convite/$token',
+  path: '/convite/$token',
+  getParentRoute: () => FornecedorRoute,
+} as any)
+const FornecedorContratoIdRoute = FornecedorContratoIdRouteImport.update({
+  id: '/contrato/$id',
+  path: '/contrato/$id',
+  getParentRoute: () => FornecedorRoute,
+} as any)
 const AuthenticatedControladoriaPrestadoresRoute =
   AuthenticatedControladoriaPrestadoresRouteImport.update({
     id: '/prestadores',
@@ -97,13 +134,19 @@ const AuthenticatedControladoriaSolicitacoesIdFichaRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/fornecedor': typeof FornecedorRouteWithChildren
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/documentacao': typeof AuthenticatedDocumentacaoRoute
+  '/fornecedor/ficha': typeof FornecedorFichaRoute
+  '/fornecedor/': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/fornecedor/contrato/$id': typeof FornecedorContratoIdRoute
+  '/fornecedor/convite/$token': typeof FornecedorConviteTokenRoute
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
@@ -116,8 +159,13 @@ export interface FileRoutesByTo {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/documentacao': typeof AuthenticatedDocumentacaoRoute
+  '/fornecedor/ficha': typeof FornecedorFichaRoute
+  '/fornecedor': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/fornecedor/contrato/$id': typeof FornecedorContratoIdRoute
+  '/fornecedor/convite/$token': typeof FornecedorConviteTokenRoute
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
@@ -127,13 +175,19 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/fornecedor': typeof FornecedorRouteWithChildren
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/documentacao': typeof AuthenticatedDocumentacaoRoute
+  '/fornecedor/ficha': typeof FornecedorFichaRoute
+  '/fornecedor/': typeof FornecedorIndexRoute
   '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
+  '/fornecedor/contrato/$id': typeof FornecedorContratoIdRoute
+  '/fornecedor/convite/$token': typeof FornecedorConviteTokenRoute
   '/_authenticated/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/_authenticated/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
   '/_authenticated/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
@@ -143,13 +197,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/fornecedor'
     | '/login'
     | '/nova-senha'
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/documentacao'
+    | '/fornecedor/ficha'
+    | '/fornecedor/'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
+    | '/fornecedor/contrato/$id'
+    | '/fornecedor/convite/$token'
     | '/controladoria/contratos/$id'
     | '/controladoria/prestadores/$id'
     | '/controladoria/prestadores/novo'
@@ -162,8 +222,13 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/documentacao'
+    | '/fornecedor/ficha'
+    | '/fornecedor'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
+    | '/fornecedor/contrato/$id'
+    | '/fornecedor/convite/$token'
     | '/controladoria/contratos/$id'
     | '/controladoria/prestadores/$id'
     | '/controladoria/prestadores/novo'
@@ -172,13 +237,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/fornecedor'
     | '/login'
     | '/nova-senha'
     | '/recuperar-senha'
     | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
+    | '/_authenticated/documentacao'
+    | '/fornecedor/ficha'
+    | '/fornecedor/'
     | '/_authenticated/controladoria/aprovacoes'
     | '/_authenticated/controladoria/prestadores'
+    | '/fornecedor/contrato/$id'
+    | '/fornecedor/convite/$token'
     | '/_authenticated/controladoria/contratos/$id'
     | '/_authenticated/controladoria/prestadores/$id'
     | '/_authenticated/controladoria/prestadores/novo'
@@ -188,6 +259,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  FornecedorRoute: typeof FornecedorRouteWithChildren
   LoginRoute: typeof LoginRoute
   NovaSenhaRoute: typeof NovaSenhaRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
@@ -216,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fornecedor': {
+      id: '/fornecedor'
+      path: '/fornecedor'
+      fullPath: '/fornecedor'
+      preLoaderRoute: typeof FornecedorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -230,6 +309,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fornecedor/': {
+      id: '/fornecedor/'
+      path: '/'
+      fullPath: '/fornecedor/'
+      preLoaderRoute: typeof FornecedorIndexRouteImport
+      parentRoute: typeof FornecedorRoute
+    }
+    '/fornecedor/ficha': {
+      id: '/fornecedor/ficha'
+      path: '/ficha'
+      fullPath: '/fornecedor/ficha'
+      preLoaderRoute: typeof FornecedorFichaRouteImport
+      parentRoute: typeof FornecedorRoute
+    }
+    '/_authenticated/documentacao': {
+      id: '/_authenticated/documentacao'
+      path: '/documentacao'
+      fullPath: '/documentacao'
+      preLoaderRoute: typeof AuthenticatedDocumentacaoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -243,6 +343,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/controladoria'
       preLoaderRoute: typeof AuthenticatedControladoriaRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/fornecedor/convite/$token': {
+      id: '/fornecedor/convite/$token'
+      path: '/convite/$token'
+      fullPath: '/fornecedor/convite/$token'
+      preLoaderRoute: typeof FornecedorConviteTokenRouteImport
+      parentRoute: typeof FornecedorRoute
+    }
+    '/fornecedor/contrato/$id': {
+      id: '/fornecedor/contrato/$id'
+      path: '/contrato/$id'
+      fullPath: '/fornecedor/contrato/$id'
+      preLoaderRoute: typeof FornecedorContratoIdRouteImport
+      parentRoute: typeof FornecedorRoute
     }
     '/_authenticated/controladoria/prestadores': {
       id: '/_authenticated/controladoria/prestadores'
@@ -334,20 +448,41 @@ const AuthenticatedControladoriaRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedControladoriaRoute: typeof AuthenticatedControladoriaRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDocumentacaoRoute: typeof AuthenticatedDocumentacaoRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedControladoriaRoute: AuthenticatedControladoriaRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDocumentacaoRoute: AuthenticatedDocumentacaoRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface FornecedorRouteChildren {
+  FornecedorFichaRoute: typeof FornecedorFichaRoute
+  FornecedorIndexRoute: typeof FornecedorIndexRoute
+  FornecedorContratoIdRoute: typeof FornecedorContratoIdRoute
+  FornecedorConviteTokenRoute: typeof FornecedorConviteTokenRoute
+}
+
+const FornecedorRouteChildren: FornecedorRouteChildren = {
+  FornecedorFichaRoute: FornecedorFichaRoute,
+  FornecedorIndexRoute: FornecedorIndexRoute,
+  FornecedorContratoIdRoute: FornecedorContratoIdRoute,
+  FornecedorConviteTokenRoute: FornecedorConviteTokenRoute,
+}
+
+const FornecedorRouteWithChildren = FornecedorRoute._addFileChildren(
+  FornecedorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  FornecedorRoute: FornecedorRouteWithChildren,
   LoginRoute: LoginRoute,
   NovaSenhaRoute: NovaSenhaRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
