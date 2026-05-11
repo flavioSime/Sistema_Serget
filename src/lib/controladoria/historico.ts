@@ -11,7 +11,7 @@ export async function logHistorico(
     entidade,
     entidade_id,
     acao,
-    payload: payload ?? null,
+    payload: (payload ?? null) as never,
     user_id: user?.id ?? null,
   });
 }
