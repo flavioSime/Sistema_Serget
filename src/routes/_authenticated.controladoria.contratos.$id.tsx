@@ -174,7 +174,7 @@ function ContratoPage() {
       return;
     }
     const now = new Date().toISOString();
-    const update: Record<string, unknown> = {};
+    const update: Record<string, string> = {};
     if (etapa.key === "tatiane") {
       update.assinado_tatiane_em = now;
       update.assinado_tatiane_por = user.id;
