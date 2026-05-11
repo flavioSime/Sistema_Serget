@@ -77,6 +77,14 @@ export const salvarFichaFornecedor = createServerFn({ method: "POST" })
       user_id: context.userId,
     });
 
+    // Notifica controladoria (stub — aguarda configuração de domínio)
+    await supabaseAdmin.from("historico").insert({
+      entidade: "email",
+      entidade_id: convite.prestador_id,
+      acao: "email_ficha_recebida",
+      user_id: context.userId,
+    });
+
     return { ok: true };
   });
 
