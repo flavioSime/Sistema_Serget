@@ -16,6 +16,7 @@ import { Route as FornecedorRouteImport } from './routes/fornecedor'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FornecedorIndexRouteImport } from './routes/fornecedor.index'
+import { Route as FornecedorFichaRouteImport } from './routes/fornecedor.ficha'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 import { Route as FornecedorConviteTokenRouteImport } from './routes/fornecedor.convite.$token'
@@ -58,6 +59,11 @@ const IndexRoute = IndexRouteImport.update({
 const FornecedorIndexRoute = FornecedorIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => FornecedorRoute,
+} as any)
+const FornecedorFichaRoute = FornecedorFichaRouteImport.update({
+  id: '/ficha',
+  path: '/ficha',
   getParentRoute: () => FornecedorRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fornecedor/ficha': typeof FornecedorFichaRoute
   '/fornecedor/': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fornecedor/ficha': typeof FornecedorFichaRoute
   '/fornecedor': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/fornecedor/ficha': typeof FornecedorFichaRoute
   '/fornecedor/': typeof FornecedorIndexRoute
   '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/fornecedor/ficha'
     | '/fornecedor/'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/fornecedor/ficha'
     | '/fornecedor'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
+    | '/fornecedor/ficha'
     | '/fornecedor/'
     | '/_authenticated/controladoria/aprovacoes'
     | '/_authenticated/controladoria/prestadores'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/fornecedor/'
       preLoaderRoute: typeof FornecedorIndexRouteImport
+      parentRoute: typeof FornecedorRoute
+    }
+    '/fornecedor/ficha': {
+      id: '/fornecedor/ficha'
+      path: '/ficha'
+      fullPath: '/fornecedor/ficha'
+      preLoaderRoute: typeof FornecedorFichaRouteImport
       parentRoute: typeof FornecedorRoute
     }
     '/_authenticated/dashboard': {
@@ -402,11 +421,13 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface FornecedorRouteChildren {
+  FornecedorFichaRoute: typeof FornecedorFichaRoute
   FornecedorIndexRoute: typeof FornecedorIndexRoute
   FornecedorConviteTokenRoute: typeof FornecedorConviteTokenRoute
 }
 
 const FornecedorRouteChildren: FornecedorRouteChildren = {
+  FornecedorFichaRoute: FornecedorFichaRoute,
   FornecedorIndexRoute: FornecedorIndexRoute,
   FornecedorConviteTokenRoute: FornecedorConviteTokenRoute,
 }
