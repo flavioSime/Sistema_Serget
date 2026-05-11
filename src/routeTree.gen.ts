@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as FornecedorRouteImport } from './routes/fornecedor'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FornecedorIndexRouteImport } from './routes/fornecedor.index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedControladoriaRouteImport } from './routes/_authenticated.controladoria'
 import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './routes/_authenticated.controladoria.prestadores'
@@ -52,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const FornecedorIndexRoute = FornecedorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FornecedorRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -103,12 +109,13 @@ const AuthenticatedControladoriaSolicitacoesIdFichaRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/fornecedor': typeof FornecedorRoute
+  '/fornecedor': typeof FornecedorRouteWithChildren
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fornecedor/': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
@@ -118,12 +125,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/fornecedor': typeof FornecedorRoute
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fornecedor': typeof FornecedorIndexRoute
   '/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
@@ -135,12 +142,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/fornecedor': typeof FornecedorRoute
+  '/fornecedor': typeof FornecedorRouteWithChildren
   '/login': typeof LoginRoute
   '/nova-senha': typeof NovaSenhaRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/controladoria': typeof AuthenticatedControladoriaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/fornecedor/': typeof FornecedorIndexRoute
   '/_authenticated/controladoria/aprovacoes': typeof AuthenticatedControladoriaAprovacoesRoute
   '/_authenticated/controladoria/prestadores': typeof AuthenticatedControladoriaPrestadoresRouteWithChildren
   '/_authenticated/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
@@ -158,6 +166,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/fornecedor/'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
     | '/controladoria/contratos/$id'
@@ -167,12 +176,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/fornecedor'
     | '/login'
     | '/nova-senha'
     | '/recuperar-senha'
     | '/controladoria'
     | '/dashboard'
+    | '/fornecedor'
     | '/controladoria/aprovacoes'
     | '/controladoria/prestadores'
     | '/controladoria/contratos/$id'
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/recuperar-senha'
     | '/_authenticated/controladoria'
     | '/_authenticated/dashboard'
+    | '/fornecedor/'
     | '/_authenticated/controladoria/aprovacoes'
     | '/_authenticated/controladoria/prestadores'
     | '/_authenticated/controladoria/contratos/$id'
@@ -200,7 +210,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  FornecedorRoute: typeof FornecedorRoute
+  FornecedorRoute: typeof FornecedorRouteWithChildren
   LoginRoute: typeof LoginRoute
   NovaSenhaRoute: typeof NovaSenhaRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
@@ -249,6 +259,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/fornecedor/': {
+      id: '/fornecedor/'
+      path: '/'
+      fullPath: '/fornecedor/'
+      preLoaderRoute: typeof FornecedorIndexRouteImport
+      parentRoute: typeof FornecedorRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -365,10 +382,22 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface FornecedorRouteChildren {
+  FornecedorIndexRoute: typeof FornecedorIndexRoute
+}
+
+const FornecedorRouteChildren: FornecedorRouteChildren = {
+  FornecedorIndexRoute: FornecedorIndexRoute,
+}
+
+const FornecedorRouteWithChildren = FornecedorRoute._addFileChildren(
+  FornecedorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  FornecedorRoute: FornecedorRoute,
+  FornecedorRoute: FornecedorRouteWithChildren,
   LoginRoute: LoginRoute,
   NovaSenhaRoute: NovaSenhaRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
