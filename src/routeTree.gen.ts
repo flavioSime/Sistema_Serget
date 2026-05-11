@@ -25,6 +25,7 @@ import { Route as FornecedorContratoIdRouteImport } from './routes/fornecedor.co
 import { Route as AuthenticatedSolicitacoesNovoRouteImport } from './routes/_authenticated.solicitacoes.novo'
 import { Route as AuthenticatedControladoriaPrestadoresRouteImport } from './routes/_authenticated.controladoria.prestadores'
 import { Route as AuthenticatedControladoriaAprovacoesRouteImport } from './routes/_authenticated.controladoria.aprovacoes'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as AuthenticatedControladoriaPrestadoresNovoRouteImport } from './routes/_authenticated.controladoria.prestadores.novo'
 import { Route as AuthenticatedControladoriaPrestadoresIdRouteImport } from './routes/_authenticated.controladoria.prestadores.$id'
 import { Route as AuthenticatedControladoriaContratosIdRouteImport } from './routes/_authenticated.controladoria.contratos.$id'
@@ -114,6 +115,12 @@ const AuthenticatedControladoriaAprovacoesRoute =
     path: '/aprovacoes',
     getParentRoute: () => AuthenticatedControladoriaRoute,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedControladoriaPrestadoresNovoRoute =
   AuthenticatedControladoriaPrestadoresNovoRouteImport.update({
     id: '/novo',
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/controladoria/solicitacoes/$id/ficha': typeof AuthenticatedControladoriaSolicitacoesIdFichaRoute
 }
 export interface FileRoutesByTo {
@@ -178,6 +186,7 @@ export interface FileRoutesByTo {
   '/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
   '/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/controladoria/solicitacoes/$id/ficha': typeof AuthenticatedControladoriaSolicitacoesIdFichaRoute
 }
 export interface FileRoutesById {
@@ -201,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/controladoria/contratos/$id': typeof AuthenticatedControladoriaContratosIdRoute
   '/_authenticated/controladoria/prestadores/$id': typeof AuthenticatedControladoriaPrestadoresIdRoute
   '/_authenticated/controladoria/prestadores/novo': typeof AuthenticatedControladoriaPrestadoresNovoRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/_authenticated/controladoria/solicitacoes/$id/ficha': typeof AuthenticatedControladoriaSolicitacoesIdFichaRoute
 }
 export interface FileRouteTypes {
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/controladoria/contratos/$id'
     | '/controladoria/prestadores/$id'
     | '/controladoria/prestadores/novo'
+    | '/lovable/email/queue/process'
     | '/controladoria/solicitacoes/$id/ficha'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/controladoria/contratos/$id'
     | '/controladoria/prestadores/$id'
     | '/controladoria/prestadores/novo'
+    | '/lovable/email/queue/process'
     | '/controladoria/solicitacoes/$id/ficha'
   id:
     | '__root__'
@@ -266,6 +278,7 @@ export interface FileRouteTypes {
     | '/_authenticated/controladoria/contratos/$id'
     | '/_authenticated/controladoria/prestadores/$id'
     | '/_authenticated/controladoria/prestadores/novo'
+    | '/lovable/email/queue/process'
     | '/_authenticated/controladoria/solicitacoes/$id/ficha'
   fileRoutesById: FileRoutesById
 }
@@ -276,6 +289,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NovaSenhaRoute: typeof NovaSenhaRoute
   RecuperarSenhaRoute: typeof RecuperarSenhaRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -391,6 +405,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/controladoria/aprovacoes'
       preLoaderRoute: typeof AuthenticatedControladoriaAprovacoesRouteImport
       parentRoute: typeof AuthenticatedControladoriaRoute
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/controladoria/prestadores/novo': {
       id: '/_authenticated/controladoria/prestadores/novo'
@@ -508,6 +529,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NovaSenhaRoute: NovaSenhaRoute,
   RecuperarSenhaRoute: RecuperarSenhaRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
